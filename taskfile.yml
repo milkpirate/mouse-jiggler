@@ -1,0 +1,19 @@
+version: '3'
+
+vars:
+  path: 'E:\\'
+  board_id: nice_nano
+
+tasks:
+  install:
+    desc: Install dependencies
+    cmds:
+      - uv run circup --path '{{ .path }}' install --requirement requirements.txt
+      - uv run circuitpython_setboard {{ .board_id }}
+
+  build:
+    desc: Upload source
+    deps:
+      - install
+    cmds:
+      - cp *.py {{ .path }}

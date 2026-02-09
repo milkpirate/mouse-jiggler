@@ -1,0 +1,11 @@
+[project]
+name = "gosnesctrl"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = "==3.13.*"   # though circuitepython ~ python 3.4
+dependencies = [
+    "adafruit-circuitpython-ble>=10.1.0",
+    "adafruit-circuitpython-hid>=6.1.8",
+    "circuitpython-stubs>=10.0.3",
+    "circup>=2.3.0",
+]
