@@ -4,10 +4,10 @@ import usb_cdc
 import digitalio
 import time
 
-drive_button = digitalio.DigitalInOut(board.D10)
-drive_button.pull = digitalio.Pull.DOWN
-time.sleep(2)
+disable_drive = digitalio.DigitalInOut(board.GP28)
+disable_drive.pull = digitalio.Pull.UP
+time.sleep(1)
 
-if not drive_button.value:
+if disable_drive.value:
     storage.disable_usb_drive()
     usb_cdc.enable(console=True, data=False)
