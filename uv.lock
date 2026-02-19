@@ -361,6 +361,7 @@ dependencies = [
     { name = "circuitpython-stubs" },
     { name = "circuitpython-tool" },
     { name = "circup" },
+    { name = "pyserial" },
 ]
 
 [package.metadata]
@@ -371,6 +372,7 @@ requires-dist = [
     { name = "circuitpython-stubs", specifier = ">=10.0.3" },
     { name = "circuitpython-tool", specifier = ">=0.11.0" },
     { name = "circup", specifier = ">=2.3.0" },
+    { name = "pyserial", specifier = ">=3.5" },
 ]
 
 [[package]]

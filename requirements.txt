@@ -1,3 +1,4 @@
 adafruit_ble>=10.1.0
 adafruit_hid>=6.1.8
 neopixel>=6.3.21
+asyncio>=3.0.3

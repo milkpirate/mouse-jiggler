@@ -10,15 +10,30 @@ tasks:
   install:
     desc: Install dependencies
     cmds:
+      - task: enable_drive
       - uv run circup --path '{{ .path }}' install --requirement requirements.txt
       - uv run circuitpython_setboard {{ .board_id }}
 
   upload:
     desc: Upload source
     deps:
-      - install
+      - enable_drive
     sources:
-      - '*.py'g
-      - 'lib/**/*'
+      - 'src/**/*'
+    generates:
+      - '{{ .patth }}/**/*'
     cmds:
-      - cp -vr *.py lib/ {{ .path }}
+      - task: install
+      - cp -vr src/* {{ .path }}
+
+  enable_drive:
+    desc: Temporarily enable the drive by opening and closing the serial port
+    status:
+      - test -d {{ .path }}
+    cmds:
+      - uv run python controll.py
+      - while ! test -d {{ .path }}; do sleep .1; done
+
+  start_serial:
+    interactive: true
+    desc: Start a serial monitor

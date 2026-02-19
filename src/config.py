@@ -1,0 +1,2 @@
+drive_flag_file="usb_drive.enable"
+serial_drive_enable_command="enable_usb_reboot"
