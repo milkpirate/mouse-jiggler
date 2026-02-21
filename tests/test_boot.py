@@ -2,6 +2,7 @@ import pytest
 
 from src.config import button_pin
 
+
 @pytest.mark.parametrize(
     "button_pressed, active_low, drive_files, list_error, rm_error, disable_drive",
     [
@@ -32,7 +33,8 @@ def test_boot(circuit_python_mocks, active_low, button_pressed, drive_files, lis
 
     circuit_python_mocks.digitalio.DigitalInOut.assert_called_once_with(button_pin)
     button_instance = circuit_python_mocks.digitalio.DigitalInOut.return_value
-    assert button_instance.pull == circuit_python_mocks.digitalio.Pull.UP if active_low else circuit_python_mocks.digitalio.Pull.DOWN
+    assert button_instance.pull == circuit_python_mocks.digitalio.Pull.UP \
+        if active_low else circuit_python_mocks.digitalio.Pull.DOWN
     circuit_python_mocks.time.sleep.assert_called_once_with(1)
     circuit_python_mocks.os.listdir.assert_called_once_with("/")
 

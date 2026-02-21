@@ -1,8 +1,9 @@
 """Tests for formatting and utility functions."""
 import asyncio
+from unittest.mock import AsyncMock, MagicMock, call, patch
+
 import pytest
 
-from unittest.mock import MagicMock, call, patch, AsyncMock
 
 @pytest.mark.parametrize(
     "interval, distance",
@@ -156,17 +157,12 @@ async def test_run_forever(async_sleep_mock):
 
 
 async def test_main(circuit_python_mocks, async_sleep_mock):
+    from src.config import drive_flag_file, jiggle_distance, serial_drive_enable_command, tickle_interval
     from src.main import (
-        main,
-        serial_usage_message,
-        serial_command_handling,
         jiggler,
-    )
-    from src.config import (
-        tickle_interval,
-        jiggle_distance,
-        serial_drive_enable_command,
-        drive_flag_file
+        main,
+        serial_command_handling,
+        serial_usage_message,
     )
 
     with (

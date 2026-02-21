@@ -1,12 +1,11 @@
-"""Tests for formatting and utility functions."""
 from unittest.mock import (
+    AsyncMock,
     MagicMock,
     patch,
-    AsyncMock,
 )
 
 
-def test_SerialCommandHandler_init():
+def test_SerialCommandHandler_init():  # noqa: N802
     from src.main import SerialCommandHandler
 
     sch = SerialCommandHandler("cmd")
@@ -15,7 +14,7 @@ def test_SerialCommandHandler_init():
     assert sch.buffer == ""
 
 
-async def test_SerialCommandHandler_command_received(circuit_python_mocks):
+async def test_SerialCommandHandler_command_received(circuit_python_mocks):  # noqa: N802
     from src.main import SerialCommandHandler
 
     sch = SerialCommandHandler("cmd")
@@ -40,7 +39,7 @@ async def test_SerialCommandHandler_command_received(circuit_python_mocks):
     assert sch.buffer == "preloadsome\nchun"
 
 
-async def test_SerialCommandHandler__process_lines(capsys):
+async def test_SerialCommandHandler__process_lines(capsys):  # noqa: N802
     from src.main import SerialCommandHandler
 
     sch = SerialCommandHandler("cmd")

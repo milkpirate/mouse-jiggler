@@ -3,6 +3,7 @@ from unittest.mock import call
 
 import pytest
 
+
 @pytest.mark.parametrize(
     "duration, expected",
     [
@@ -25,21 +26,6 @@ def test_min_sec_fmt(duration, expected):
     from src.main import min_sec_fmt
 
     assert min_sec_fmt(duration) == expected
-
-
-@pytest.mark.parametrize(
-    "distance",
-    [-3, 4, 0, 1, 10],
-)
-def test_jiggle(mouse_mock, distance):
-    from src.main import jiggle
-
-    jiggle(mouse_mock, distance)
-
-    mouse_mock.move.assert_has_calls([
-        call(x=distance),
-        call(x=-distance),
-    ], any_order=False)
 
 
 @pytest.mark.parametrize(

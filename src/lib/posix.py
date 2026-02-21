@@ -1,4 +1,5 @@
 import os
+
 import microcontroller
 
 
@@ -15,23 +16,23 @@ def rm(path: str):
 
 def ls(path: str = '.'):
     """List files in a directory."""
-    l = os.listdir(path)
+    lst = os.listdir(path)
 
     dir_bit = 0b0100_0000_0000_0000
     ds = [
-        d for d in l
+        d for d in lst
         if os.stat(path + os.sep + d)[0]
            & dir_bit
     ]
     ds = [d + os.sep for d in ds]
-    fs = [f for f in l if f not in ds]
+    fs = [f for f in lst if f not in ds]
 
     ds.sort()
     fs.sort()
 
     [print(d) for d in ds]
     [print(f) for f in fs]
-    return l
+    return lst
 
 def touch(path: str):
     """Create an empty file or update its timestamp."""

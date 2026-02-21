@@ -1,16 +1,16 @@
-import sys
 import asyncio
+import sys
 
-import usb_hid
-import supervisor
 import microcontroller
+import supervisor
+import usb_hid
 from adafruit_hid.mouse import Mouse
 
 from config import (
     drive_flag_file,
+    jiggle_distance,
     serial_drive_enable_command,
     tickle_interval,
-    jiggle_distance,
 )
 
 

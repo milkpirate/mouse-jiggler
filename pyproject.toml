@@ -20,7 +20,18 @@ dev = [
     "pytest-clarity>=1.0.1",
     "pytest-cov>=7.0.0",
     "pytest-html>=4.2.0",
+    "ruff>=0.15.2",
 ]
+
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W"]
+ignore = []
+
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
@@ -51,7 +62,6 @@ addopts = [
     "-rsxXq",
     "-vv",
 ]
-
 
 log_format = "%(asctime)s %(levelname)s %(message)s"
 log_date_format = "%Y-%m-%d %H:%M:%S"

@@ -1,14 +1,15 @@
+import os
+import time
+
+import board
+import digitalio
 import storage
 import usb_cdc
-import digitalio
-import time
-import os
-import board
 
 from config import (
-    drive_flag_file,
-    button_pin,
     button_active_low,
+    button_pin,
+    drive_flag_file,
 )
 
 
@@ -28,7 +29,7 @@ def boot():
     try:
         enable_drive_file_exists = drive_flag_file in os.listdir("/")
         os.remove(drive_flag_file)
-    except:
+    except: # noqa: E722
         pass
 
     disable_drive = not (enable_drive_button_pressed or enable_drive_file_exists)

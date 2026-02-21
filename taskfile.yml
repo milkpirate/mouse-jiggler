@@ -58,8 +58,14 @@ tasks:
       - uv run python control.py
       - while ! test -d {{ .path }}; do sleep .1; done
 
+  lint:
+    desc: Run linters.
+    cmds:
+      - uv run ruff check --fix src tests
+
   test:
     desc: Run tests.
     cmds:
+      - task: lint
       - rm -rv reports/ .coverage || true
       - uv run pytest tests
