@@ -1,0 +1,4 @@
+Adafruit CircuitPython 10.0.3 on 2025-10-17; dummy
+Board ID:dummy
+UID:0000000000000000
+boot.py output:

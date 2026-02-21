@@ -1,0 +1,31 @@
+name: package
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  dist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install task
+        uses: go-task/setup-task@v1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name : Ensure functionality
+        run: task test
+
+      - name : Package distribution
+        run: task dist
+
+      - name: Upload package
+        uses: actions/upload-artifact@v6
+        with:
+          name: mouse-jiggler-dist
+          path: dist/

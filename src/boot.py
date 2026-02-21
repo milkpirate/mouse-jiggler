@@ -3,6 +3,7 @@ import usb_cdc
 import digitalio
 import time
 import os
+import board
 
 from config import (
     drive_flag_file,
@@ -12,13 +13,17 @@ from config import (
 
 
 def boot():
-    enable_drive_button = digitalio.DigitalInOut(button_pin)
-    enable_drive_button.pull = digitalio.Pull.UP if button_active_low else digitalio.Pull.DOWN
-    time.sleep(1)
+    button_pin_object = getattr(board, button_pin, None)
+    button_value = not button_active_low
 
-    enable_drive_button_pressed = enable_drive_button.value ^ button_active_low
+    if button_pin_object:
+        enable_drive_button = digitalio.DigitalInOut(button_pin)
+        enable_drive_button.pull = digitalio.Pull.UP if button_active_low else digitalio.Pull.DOWN
+        time.sleep(1)
+        button_value = enable_drive_button.value
+
+    enable_drive_button_pressed = button_value ^ button_active_low
     enable_drive_file_exists = False
-
 
     try:
         enable_drive_file_exists = drive_flag_file in os.listdir("/")
