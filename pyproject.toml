@@ -12,3 +12,54 @@ dependencies = [
     "circup>=2.3.0",
     "pyserial>=3.5",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.3.0",
+    "pytest-clarity>=1.0.1",
+    "pytest-cov>=6.2.1",
+    "pytest-html>=4.1.1",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+junit_suite_name = "mouse-jiggler"
+
+pythonpath = [
+    "src"
+]
+
+testpaths = [
+    "tests",
+]
+
+#  add --no-cov to make breakpoints trip on debugging pytest
+addopts = [
+    "--tb=short",
+    "--failed-first",
+    "--doctest-modules",
+    "--junitxml=reports/custom_code.xml",
+    "--cov-report=term",
+    "--cov-report=term-missing",
+    "--cov-report=html:reports/coverage/cov_html/",
+    "--cov-report=xml:reports/coverage/cov.xml",
+    "--cov-report=annotate:reports/coverage/cov_annotate",
+    "--cov=src/",
+    "--html=reports/report.html",
+    "--self-contained-html",
+    "-rsxXq",
+    "-vv",
+]
+
+log_format = "%(asctime)s %(levelname)s %(message)s"
+log_date_format = "%Y-%m-%d %H:%M:%S"
+
+doctest_encoding = "utf-8"
+doctest_optionflags = [
+    "ELLIPSIS",
+    "NORMALIZE_WHITESPACE",
+    "IGNORE_EXCEPTION_DETAIL",
+    "ALLOW_UNICODE",
+    "ALLOW_BYTES",
+]
