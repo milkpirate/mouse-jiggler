@@ -235,11 +235,11 @@ wheels = [
 
 [[package]]
 name = "circuitpython-stubs"
-version = "10.0.3"
+version = "10.1.3"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/ef/0b/b532c975a2bd24fbb55065e13fdd8dde00c4a6b99e35533b0a19e6567e1c/circuitpython_stubs-10.0.3.tar.gz", hash = "sha256:0319d7b328add88d1a37d3fe95291fbb9ad1343c570cf7061724b49d63ef1cb8", size = 364254, upload-time = "2025-10-17T20:25:53.276Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b7/d8/c8c94ed40091fd262777d2857ae6c0f78ac45facfcac3d709f4363f2929a/circuitpython_stubs-10.1.3.tar.gz", hash = "sha256:2088ddc0efe97e1b372ef2680a5bd4b17f28b46652db55ed114a55dc6e01ff79", size = 365520, upload-time = "2026-02-20T22:16:38.43Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/45/7b/26c95cc8592a810bb41d8c2b42c5588b28dbafe167a390e9641a838d7734/circuitpython_stubs-10.0.3-py3-none-any.whl", hash = "sha256:cf7ac3bd1c3e7853785cb79ac848f30fc3f35f44bac6feccfbfc79a07f23c015", size = 1048078, upload-time = "2025-10-17T20:25:51.491Z" },
+    { url = "https://files.pythonhosted.org/packages/48/b6/2dc8da636d83cf1621ead559c8f4c7a6f009e47a5658c9ebc42ebfb12e19/circuitpython_stubs-10.1.3-py3-none-any.whl", hash = "sha256:b799b6c99e22b4e3e60a3ebb565292b8ce8e7c29ae4bf9e3089c6a62c8bea1cb", size = 1068822, upload-time = "2026-02-20T22:16:36.961Z" },
 ]
 
 [[package]]
@@ -262,7 +262,7 @@ wheels = [
 
 [[package]]
 name = "circup"
-version = "2.3.0"
+version = "3.0.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "appdirs" },
@@ -272,9 +272,9 @@ dependencies = [
     { name = "toml" },
     { name = "update-checker" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b8/1c/9f9ae44db96e5dd75bc4f95be96c99e560085d73274e805ef2bdc8231431/circup-2.3.0.tar.gz", hash = "sha256:ce5117d6353d3b3055793738b35735955d1f535566eb90a8e0f9138814b18284", size = 122943, upload-time = "2025-11-06T15:16:11.352Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8a/c8/1f1f012953d27ab0ca8280e60e2f42917f3a76c64a0aff03e3ae98cda753/circup-3.0.1.tar.gz", hash = "sha256:be1d40d4aa6c8fdb4672b807bf99fa58955a8ebcb91c566637e98989c39aec94", size = 124586, upload-time = "2026-02-04T23:21:50.696Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b1/fe/160cf005ca5dbcb0454bbffe3f6dcb5744f902bdffd4317e86dfee2f4724/circup-2.3.0-py3-none-any.whl", hash = "sha256:93226d034f262bcd7ffdc5e700036ddfa853be3241fd70e4e1943bafcca98d53", size = 49016, upload-time = "2025-11-06T15:16:09.658Z" },
+    { url = "https://files.pythonhosted.org/packages/0c/cd/1354266314038db5f60c5e718e565dd300451f6af81d54cee245423a90be/circup-3.0.1-py3-none-any.whl", hash = "sha256:59145a80f1db18fee0b04fb93e53eff3a75ecf36303f722aca733ef39740c2bd", size = 50658, upload-time = "2026-02-04T23:21:49.631Z" },
 ]
 
 [[package]]
@@ -476,11 +476,11 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "pytest", specifier = ">=8.4.1" },
+    { name = "pytest", specifier = ">=9.0.2" },
     { name = "pytest-asyncio", specifier = ">=1.3.0" },
     { name = "pytest-clarity", specifier = ">=1.0.1" },
-    { name = "pytest-cov", specifier = ">=6.2.1" },
-    { name = "pytest-html", specifier = ">=4.1.1" },
+    { name = "pytest-cov", specifier = ">=7.0.0" },
+    { name = "pytest-html", specifier = ">=4.2.0" },
 ]
 
 [[package]]
@@ -494,11 +494,11 @@ wheels = [
 
 [[package]]
 name = "platformdirs"
-version = "4.5.1"
+version = "4.9.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/cf/86/0248f086a84f01b37aaec0fa567b397df1a119f73c16f6c7a9aac73ea309/platformdirs-4.5.1.tar.gz", hash = "sha256:61d5cdcc6065745cdd94f0f878977f8de9437be93de97c1c12f853c9c0cdcbda", size = 21715, upload-time = "2025-12-05T13:52:58.638Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1b/04/fea538adf7dbbd6d186f551d595961e564a3b6715bdf276b477460858672/platformdirs-4.9.2.tar.gz", hash = "sha256:9a33809944b9db043ad67ca0db94b14bf452cc6aeaac46a88ea55b26e2e9d291", size = 28394, upload-time = "2026-02-16T03:56:10.574Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cb/28/3bfe2fa5a7b9c46fe7e13c97bda14c895fb10fa2ebf1d0abb90e0cea7ee1/platformdirs-4.5.1-py3-none-any.whl", hash = "sha256:d03afa3963c806a9bed9d5125c8f4cb2fdaf74a55ab60e5d59b3fde758104d31", size = 18731, upload-time = "2025-12-05T13:52:56.823Z" },
+    { url = "https://files.pythonhosted.org/packages/48/31/05e764397056194206169869b50cf2fee4dbbbc71b344705b9c0d878d4d8/platformdirs-4.9.2-py3-none-any.whl", hash = "sha256:9170634f126f8efdae22fb58ae8a0eaa86f38365bc57897a6c4f781d1f5875bd", size = 21168, upload-time = "2026-02-16T03:56:08.891Z" },
 ]
 
 [[package]]
@@ -717,15 +717,15 @@ wheels = [
 
 [[package]]
 name = "rich"
-version = "14.3.2"
+version = "14.3.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markdown-it-py" },
     { name = "pygments" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/74/99/a4cab2acbb884f80e558b0771e97e21e939c5dfb460f488d19df485e8298/rich-14.3.2.tar.gz", hash = "sha256:e712f11c1a562a11843306f5ed999475f09ac31ffb64281f73ab29ffdda8b3b8", size = 230143, upload-time = "2026-02-01T16:20:47.908Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b3/c6/f3b320c27991c46f43ee9d856302c70dc2d0fb2dba4842ff739d5f46b393/rich-14.3.3.tar.gz", hash = "sha256:b8daa0b9e4eef54dd8cf7c86c03713f53241884e814f4e2f5fb342fe520f639b", size = 230582, upload-time = "2026-02-19T17:23:12.474Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ef/45/615f5babd880b4bd7d405cc0dc348234c5ffb6ed1ea33e152ede08b2072d/rich-14.3.2-py3-none-any.whl", hash = "sha256:08e67c3e90884651da3239ea668222d19bea7b589149d8014a21c633420dbb69", size = 309963, upload-time = "2026-02-01T16:20:46.078Z" },
+    { url = "https://files.pythonhosted.org/packages/14/25/b208c5683343959b670dc001595f2f3737e051da617f66c31f7c4fa93abc/rich-14.3.3-py3-none-any.whl", hash = "sha256:793431c1f8619afa7d3b52b2cdec859562b950ea0d4b6b505397612db8d5362d", size = 310458, upload-time = "2026-02-19T17:23:13.732Z" },
 ]
 
 [[package]]
