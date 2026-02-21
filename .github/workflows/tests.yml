@@ -19,24 +19,23 @@ jobs:
       - name: Test
         run: task test
 
-      - name: Test Summary
-        id: test_summary
-        uses: test-summary/action@v2
+      - name: Test Report
+        uses: dorny/test-reporter@v2
         with:
-          paths: reports/junit_test_report.xml
-          show: "fail, skip"
+          name: Mouse Jiggler Tests
+          path: reports/junit_test_report.xml
+          reporter: python-xunit
         if: always()
 
-      - name: Coverage Report (on PRs)
-        uses: xportation/junit-coverage-report@main
+      - name: Update badges
+        uses: gaelgirodon/ci-badges-action@v1
         with:
-          junit-path: reports/junit_test_report.xml
-          coverage-path: reports/coverage/junit_cov_report.xml
-        if: always()
+          gist-id: c2389bbe0a2312450ec9358e81f1b0e8
+          token: ${{ secrets.GIST_TOKEN }}
 
       - name: Upload reports
         uses: actions/upload-artifact@v6
         with:
-          name: mouse-jiggler-test_reports
+          name: mouse-jiggler-reports
           path: reports/
         if: always()
