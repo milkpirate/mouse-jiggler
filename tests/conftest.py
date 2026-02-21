@@ -1,0 +1,84 @@
+"""Pytest configuration and fixtures."""
+import pathlib
+from types import SimpleNamespace
+from unittest.mock import MagicMock, AsyncMock, patch
+import pytest
+import asyncio
+import sys
+import tempfile
+
+
+supervisor_mock_ = MagicMock()
+usb_hid_mock_ = MagicMock()
+microcontroller_ = MagicMock()
+
+sys.modules['supervisor'] = supervisor_mock_
+sys.modules['usb_hid'] = usb_hid_mock_
+sys.modules['microcontroller'] = microcontroller_
+
+
+@pytest.fixture
+def boot_mocks():
+    modules = dict(
+        storage=MagicMock(),
+        board=MagicMock(),
+        usb_cdc=MagicMock(),
+        digitalio=MagicMock(),
+        time=MagicMock(),
+        os=MagicMock(),
+    )
+
+    with patch.dict(sys.modules, modules):
+        yield SimpleNamespace(**modules)
+
+
+@pytest.fixture
+def supervisor_mock():
+    yield supervisor_mock_
+
+
+@pytest.fixture
+def usb_hid_mock():
+    yield usb_hid_mock_
+
+
+@pytest.fixture
+def microcontroller_mock():
+    yield microcontroller_
+
+
+@pytest.fixture
+def mouse_mock():
+    mouse = MagicMock()
+    mouse.move = MagicMock()
+    yield mouse
+
+
+@pytest.fixture
+def async_sleep_mock(monkeypatch):
+    sleep_mock = AsyncMock()
+    monkeypatch.setattr(asyncio, "sleep", sleep_mock)
+    yield sleep_mock
+
+
+@pytest.fixture
+def tmpfile():
+    """Create a temporary file and return its path."""
+    with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
+        temp_file.write("")
+
+    yield pathlib.Path(temp_file.name)
+
+    if pathlib.Path(temp_file.name).exists():
+        pathlib.Path(temp_file.name).unlink()
+
+
+@pytest.fixture
+def event_loop():
+    """Create an event loop for async tests."""
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+
+

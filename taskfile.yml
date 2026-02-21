@@ -25,14 +25,20 @@ tasks:
     cmds:
       - task: install
       - cp -vr src/* {{ .path }}
+      - mv {{ .path }}/main.py {{ .path }}/code.py
 
   enable_drive:
     desc: Temporarily enable the drive by opening and closing the serial port
     status:
       - test -d {{ .path }}
     cmds:
-      - uv run python controll.py
+      - uv run python control.py
       - while ! test -d {{ .path }}; do sleep .1; done
+
+  test:
+    desc: Run tests
+    cmds:
+      - uv run pytest tests
 
   start_serial:
     interactive: true
