@@ -8,11 +8,10 @@ from adafruit_hid.mouse import Mouse
 
 from config import (
     drive_flag_file,
-    serial_drive_enable_command
+    serial_drive_enable_command,
+    tickle_interval,
+    jiggle_distance,
 )
-
-DEFAULT_TICKLE_INTERVAL = 5 * 60  # 5min
-DEFAULT_JIGGLE_DISTANCE = 1
 
 
 class SerialCommandHandler:
@@ -142,13 +141,13 @@ async def main():
     setup_usb()
 
     await asyncio.sleep(5)
-    print_banner(DEFAULT_TICKLE_INTERVAL, DEFAULT_JIGGLE_DISTANCE, serial_drive_enable_command)
+    print_banner(tickle_interval, jiggle_distance, serial_drive_enable_command)
     handler = SerialCommandHandler(serial_drive_enable_command)
 
     await asyncio.gather(
         run_forever(serial_usage_message, serial_drive_enable_command),
         run_forever(serial_command_handling, handler, drive_flag_file),
-        run_forever(jiggler, mouse, DEFAULT_TICKLE_INTERVAL, DEFAULT_JIGGLE_DISTANCE)
+        run_forever(jiggler, mouse, tickle_interval, jiggle_distance)
     )
 
 
