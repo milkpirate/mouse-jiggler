@@ -8,43 +8,22 @@ import sys
 import tempfile
 
 
-supervisor_mock_ = MagicMock()
-usb_hid_mock_ = MagicMock()
-microcontroller_ = MagicMock()
-
-sys.modules['supervisor'] = supervisor_mock_
-sys.modules['usb_hid'] = usb_hid_mock_
-sys.modules['microcontroller'] = microcontroller_
-
-
-@pytest.fixture
-def boot_mocks():
-    modules = dict(
-        storage=MagicMock(),
-        board=MagicMock(),
-        usb_cdc=MagicMock(),
-        digitalio=MagicMock(),
-        time=MagicMock(),
-        os=MagicMock(),
-    )
+@pytest.fixture(autouse=True)
+def circuit_python_mocks():
+    modules = {name: MagicMock() for name in [
+        "board",
+        "storage",
+        "usb_cdc",
+        "usb_hid",
+        "digitalio",
+        "time",
+        "os",
+        "supervisor",
+        "microcontroller",
+    ]}
 
     with patch.dict(sys.modules, modules):
         yield SimpleNamespace(**modules)
-
-
-@pytest.fixture
-def supervisor_mock():
-    yield supervisor_mock_
-
-
-@pytest.fixture
-def usb_hid_mock():
-    yield usb_hid_mock_
-
-
-@pytest.fixture
-def microcontroller_mock():
-    yield microcontroller_
 
 
 @pytest.fixture

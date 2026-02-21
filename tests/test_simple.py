@@ -1,14 +1,7 @@
 """Tests for formatting and utility functions."""
-from unittest.mock import MagicMock, call, patch, AsyncMock
+from unittest.mock import call
 
 import pytest
-
-from src.main import (
-    setup_usb,
-    min_sec_fmt,
-    jiggle,
-    print_banner,
-)
 
 @pytest.mark.parametrize(
     "duration, expected",
@@ -29,6 +22,8 @@ from src.main import (
     ],
 )
 def test_min_sec_fmt(duration, expected):
+    from src.main import min_sec_fmt
+
     assert min_sec_fmt(duration) == expected
 
 
@@ -37,13 +32,14 @@ def test_min_sec_fmt(duration, expected):
     [-3, 4, 0, 1, 10],
 )
 def test_jiggle(mouse_mock, distance):
+    from src.main import jiggle
+
     jiggle(mouse_mock, distance)
 
     mouse_mock.move.assert_has_calls([
         call(x=distance),
         call(x=-distance),
     ], any_order=False)
-
 
 
 @pytest.mark.parametrize(
@@ -51,6 +47,8 @@ def test_jiggle(mouse_mock, distance):
     [-3, 4, 0, 1, 10],
 )
 def test_jiggle(mouse_mock, distance):
+    from src.main import jiggle
+
     jiggle(mouse_mock, distance)
 
     mouse_mock.move.assert_has_calls([
@@ -59,14 +57,18 @@ def test_jiggle(mouse_mock, distance):
     ], any_order=False)
 
 
-def test_setup_usb(supervisor_mock, usb_hid_mock):
+def test_setup_usb(circuit_python_mocks):
+    from src.main import setup_usb
+
     setup_usb()
 
-    supervisor_mock.set_usb_identification.assert_called_once_with("CPY", "Mouse MJ2040")
-    usb_hid_mock.set_interface_name.assert_called_once_with("CPY Mouse MJ2040")
+    circuit_python_mocks.supervisor.set_usb_identification.assert_called_once_with("CPY", "Mouse MJ2040")
+    circuit_python_mocks.usb_hid.set_interface_name.assert_called_once_with("CPY Mouse MJ2040")
 
 
 def test_print_banner(capsys):
+    from src.main import print_banner
+
     interval = 123
     distance = 234
     enable_cmd = "enable_cmd"

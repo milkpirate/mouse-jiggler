@@ -4,23 +4,6 @@ import pytest
 
 from unittest.mock import MagicMock, call, patch, AsyncMock
 
-from src.main import (
-    jiggler,
-    serial_usage_message,
-    serial_command_handling,
-    run_forever,
-    main,
-
-    DEFAULT_TICKLE_INTERVAL,
-    DEFAULT_JIGGLE_DISTANCE,
-)
-
-from src.config import (
-    serial_drive_enable_command,
-    drive_flag_file,
-)
-
-
 @pytest.mark.parametrize(
     "interval, distance",
     (
@@ -31,6 +14,8 @@ from src.config import (
     )
 )
 async def test_jiggler(capsys, mouse_mock, async_sleep_mock, interval, distance):
+    from src.main import jiggler
+
     with patch("src.main.jiggle", MagicMock()) as jiggle_mock:
         await jiggler(mouse_mock, interval, distance)
 
@@ -57,6 +42,8 @@ async def test_jiggler(capsys, mouse_mock, async_sleep_mock, interval, distance)
     )
 )
 async def test_serial_usage_message_task(capsys, async_sleep_mock, enable_cmd):
+    from src.main import serial_usage_message
+
     await serial_usage_message(enable_cmd)
 
     async_sleep_mock.assert_called_once_with(30)
@@ -74,9 +61,11 @@ async def test_serial_usage_message_task(capsys, async_sleep_mock, enable_cmd):
     )
 )
 async def test_serial_command_handling_task(
-    capsys, tmpfile, async_sleep_mock, microcontroller_mock,
+    capsys, tmpfile, async_sleep_mock, circuit_python_mocks,
     command_received, wait_duration, expected_flag_file_content
 ):
+    from src.main import serial_command_handling
+
     handler_mock = AsyncMock()
     handler_mock.command_received = AsyncMock(return_value=command_received)
 
@@ -87,7 +76,7 @@ async def test_serial_command_handling_task(
 
     if command_received:
         handler_mock.command_received.assert_awaited_once()
-        microcontroller_mock.reset.assert_called_once()
+        circuit_python_mocks.microcontroller.reset.assert_called_once()
 
         assert (
             f"\n!!! Creating temporary flag file '{tmpfile.__str__()}' and rebooting...\n"
@@ -95,13 +84,15 @@ async def test_serial_command_handling_task(
         ) == stdout
     else:
         handler_mock.command_received.assert_awaited_once()
-        microcontroller_mock.assert_not_called()
+        circuit_python_mocks.microcontroller.assert_not_called()
 
     async_sleep_mock.assert_awaited_once_with(wait_duration)
     assert tmpfile.read_text() == expected_flag_file_content, "Flag file content mismatch"
 
 
 async def test_serial_command_handling_task_open_err(capsys):
+    from src.main import serial_command_handling
+
     handler_mock = AsyncMock()
     handler_mock.command_received = AsyncMock(return_value=True)
 
@@ -117,6 +108,8 @@ async def test_serial_command_handling_task_open_err(capsys):
 
 
 async def test_serial_command_handling_task_write_err(capsys):
+    from src.main import serial_command_handling
+
     handler_mock = AsyncMock()
     handler_mock.command_received = AsyncMock(return_value=True)
 
@@ -136,6 +129,8 @@ async def test_serial_command_handling_task_write_err(capsys):
 
 
 async def test_run_forever(async_sleep_mock):
+    from src.main import run_forever
+
     coro_mock = AsyncMock()
     iteration_count = 0
 
@@ -160,7 +155,20 @@ async def test_run_forever(async_sleep_mock):
     )
 
 
-async def test_main(usb_hid_mock, async_sleep_mock):
+async def test_main(circuit_python_mocks, async_sleep_mock):
+    from src.main import (
+        main,
+        serial_usage_message,
+        serial_command_handling,
+        jiggler,
+    )
+    from src.config import (
+        tickle_interval,
+        jiggle_distance,
+        serial_drive_enable_command,
+        drive_flag_file
+    )
+
     with (
         patch("src.main.Mouse", MagicMock()) as mouse_mock,
         patch("src.main.setup_usb", MagicMock()) as setup_usb_mock,
@@ -173,17 +181,17 @@ async def test_main(usb_hid_mock, async_sleep_mock):
         run_forever_mock.side_effect = rf_results
         await main()
 
-    mouse_mock.assert_called_once_with(usb_hid_mock.devices)
+    mouse_mock.assert_called_once_with(circuit_python_mocks.usb_hid.devices)
     setup_usb_mock.assert_called_once()
     print_banner_mock.assert_called_once_with(
-        DEFAULT_TICKLE_INTERVAL, DEFAULT_JIGGLE_DISTANCE, serial_drive_enable_command
+        tickle_interval, jiggle_distance, serial_drive_enable_command
     )
     sch_mock.assert_called_once_with(serial_drive_enable_command)
 
     run_forever_mock.assert_has_calls([
         call(serial_usage_message, serial_drive_enable_command),
         call(serial_command_handling, sch_mock.return_value, drive_flag_file),
-        call(jiggler, mouse_mock.return_value, DEFAULT_TICKLE_INTERVAL, DEFAULT_JIGGLE_DISTANCE)
+        call(jiggler, mouse_mock.return_value, tickle_interval, jiggle_distance)
     ])
 
     aio_gather_mock.assert_called_once_with(*rf_results)
