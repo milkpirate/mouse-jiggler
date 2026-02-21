@@ -1,21 +1,23 @@
 version: '3'
 
+
 vars:
   path: 'E:\\'
-  board_id: nice_nano
+
 
 interval: 500ms
 
+
 tasks:
   install:
-    desc: Install dependencies
+    desc: Install dependencies.
     cmds:
       - task: enable_drive
       - uv run circup --path '{{ .path }}' install --requirement requirements.txt
       - uv run circuitpython_setboard {{ .board_id }}
 
   upload:
-    desc: Upload source
+    desc: Upload firmware to the board.
     deps:
       - enable_drive
     sources:
@@ -28,7 +30,7 @@ tasks:
       - mv {{ .path }}/main.py {{ .path }}/code.py
 
   enable_drive:
-    desc: Temporarily enable the drive by opening and closing the serial port
+    desc: Temporarily enable the drive, to allow uploading firmware.
     status:
       - test -d {{ .path }}
     cmds:
@@ -36,10 +38,7 @@ tasks:
       - while ! test -d {{ .path }}; do sleep .1; done
 
   test:
-    desc: Run tests
+    desc: Run tests.
     cmds:
+      - rm -rv reports/ .coverage || true
       - uv run pytest tests
-
-  start_serial:
-    interactive: true
-    desc: Start a serial monitor
