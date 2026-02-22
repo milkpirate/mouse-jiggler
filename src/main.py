@@ -9,45 +9,49 @@ from adafruit_hid.mouse import Mouse
 
 
 class SerialCommandHandler:
-    """Handles serial command processing with buffering."""
+    """Handles serial command processing with StreamReader."""
 
     def __init__(self, enable_command: str):
         self.enable_command = enable_command
-        self.buffer = ""
+        self.reader = asyncio.StreamReader()
+
+    def _fill_reader(self):
+        if not (available_bytes := supervisor.runtime.serial_bytes_available):
+            return False
+
+        if not (chunk := sys.stdin.read(available_bytes)):
+            return False
+
+        if isinstance(chunk, str):
+            chunk = chunk.encode()
+
+        self.reader.feed_data(chunk)
+        return True
+
+    async def _read_out(self):
+        try:
+            line = await asyncio.wait_for(self.reader.readline(), timeout=0.01)
+        except asyncio.TimeoutError:
+            return None
+        except Exception as e:
+            print(f"Error reading from serial: {e}")
+            return None
+
+        return line.decode().strip()
 
     async def command_received(self) -> bool:
-        """
-        Process available serial data.
-        Returns True if command matches enable_command.
-        """
-        available_bytes = supervisor.runtime.serial_bytes_available
-        if not available_bytes:
+        """Process available serial data. Returns True if command matches enable_command."""
+        if not self._fill_reader():
             return False
 
-        chunk = sys.stdin.read(available_bytes)
-        if not chunk:
+        if (line := await self._read_out()) is None:
             return False
 
-        self.buffer += chunk.replace("\r", "\n")
-        return await self._process_lines()
-
-    async def _process_lines(self) -> bool:
-        """Process complete lines in buffer."""
-        if "\n" not in self.buffer:
-            return False
-
-        line, self.buffer = self.buffer.split("\n", 1)
-        command = line.strip()
-
-        if not command:
-            return False
-
-        if command == self.enable_command:
+        if line == self.enable_command:
             return True
 
-        print(f"Unknown command: {command}")
+        print(f"Unknown command: {line!r}")
         print(f"Available commands: {self.enable_command}")
-
         return False
 
 
@@ -71,7 +75,7 @@ async def serial_command_handling(handler: SerialCommandHandler, flag_file: str)
         await asyncio.sleep(0.05)
         return
 
-    print(f"\n!!! Creating temporary flag file '{flag_file}' and rebooting...")
+    print(f"\n!!! Creating temporary flag file {flag_file!r} and rebooting...")
     print("!!! USB storage will be enabled for next boot only!")
 
     try:
@@ -87,7 +91,7 @@ async def serial_command_handling(handler: SerialCommandHandler, flag_file: str)
 
 async def serial_usage_message(enable_command: str):
     """Task to periodically print usage message."""
-    print(f"Send: '{enable_command}' - to reboot with temporarily enable USB storage")
+    print(f"Send: {enable_command!r} - to reboot with temporarily enable USB storage")
     await asyncio.sleep(30)
 
 
@@ -116,7 +120,7 @@ def print_banner(interval: int, distance: int, enable_command: str):
     print("Mouse jiggler started!\n")
     print(f"Interval {min_sec_fmt(interval)}")
     print(f"Distance ±{distance}px")
-    print(f"Serial command: '{enable_command}' - to reboot with temporarily enable USB storage")
+    print(f"Serial command: {enable_command!r} - to reboot with temporarily enable USB storage")
     print("Enter main loop...\n")
 
 

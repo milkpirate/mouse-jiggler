@@ -80,7 +80,7 @@ async def test_serial_command_handling_task(
         circuit_python_mocks.microcontroller.reset.assert_called_once()
 
         assert (
-            f"\n!!! Creating temporary flag file '{tmpfile.__str__()}' and rebooting...\n"
+            f"\n!!! Creating temporary flag file {tmpfile.__str__()!r} and rebooting...\n"
             "!!! USB storage will be enabled for next boot only!\n"
         ) == stdout
     else:

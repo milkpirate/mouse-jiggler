@@ -71,7 +71,6 @@ def test_boot(circuit_python_mocks, mouse_mock, async_sleep_mock, button_pressed
         button_activation="button_activation",
     ).get(key, default)
 
-
     from boot import boot
 
     with (
