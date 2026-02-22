@@ -54,7 +54,7 @@ tasks:
   enable_drive:
     desc: Temporarily enable the drive, to allow uploading firmware.
     status:
-      - test -d {{ .path }}
+      - test -d '{{ .path }}'
     cmds:
       - uv run python tools enable_drive
       - while ! test -d '{{ .path }}'; do sleep .1; done
