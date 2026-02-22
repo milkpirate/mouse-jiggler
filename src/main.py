@@ -1,17 +1,11 @@
 import asyncio
+import os
 import sys
 
 import microcontroller
 import supervisor
 import usb_hid
 from adafruit_hid.mouse import Mouse
-
-from config import (
-    drive_flag_file,
-    jiggle_distance,
-    serial_drive_enable_command,
-    tickle_interval,
-)
 
 
 class SerialCommandHandler:
@@ -139,6 +133,11 @@ async def run_forever(coro_func, *a, **kw):
 async def main():
     mouse = Mouse(usb_hid.devices)
     setup_usb()
+
+    tickle_interval = os.getenv("tickle_interval")
+    jiggle_distance = os.getenv("jiggle_distance")
+    drive_flag_file = os.getenv("drive_flag_file")
+    serial_drive_enable_command = os.getenv("serial_drive_enable_command")
 
     await asyncio.sleep(5)
     print_banner(tickle_interval, jiggle_distance, serial_drive_enable_command)

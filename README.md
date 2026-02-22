@@ -13,7 +13,7 @@ Hardware mouse jiggler based on Raspberry Pi Pico and [CircuitPython](https://ci
 - Configurable drive activation button pin and behavior
 
 ## Configuration
-See [`config.py`] for available options. Further one need to configure the location where the [CircuitPython] 
+See [`settings.toml`] for available options. Further one need to configure the location where the [CircuitPython] 
 drive shows up on your system. This is required to be able to deploy the firmware to the device.
 
 ## Hardware
@@ -26,7 +26,7 @@ the functionality.
 ## Software
 The firmware is written in [CircuitPython] and can be easily adapted to other microcontrollers supported by
 CircuitPython. The code is mostly hardware independent, except the pin definitions (and USB HID 
-capability) which can be configured in the [`config.py`] file.
+capability) which can be configured in the [`settings.toml`] file.
 
 It starts several asynchronous tasks:
 - one for the jiggling
@@ -43,7 +43,7 @@ Please consult `task --list` for available tasks.
 task setup    # will PlatformIO, require dependencies and the board definitions for nicenano 
 task upload   # will build and flash the firmware to the device
 ```
-[`config.py`]: src/config.py
+[`settings.toml`]: src/settings.toml
 
 [CircuitPython]: https://circuitpython.org/
 [RP2040 development board]: https://de.aliexpress.com/item/1005006711101391.html?spm=a2g0o.order_list.order_list_main.11.12d01802GCZ1p2&gatewayAdapt=glo2deu

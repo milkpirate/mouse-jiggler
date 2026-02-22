@@ -2,7 +2,8 @@ version: '3'
 
 
 vars:
-  path: 'E:\\'
+  path:
+    sh: uv run python tools setting circuit_python_drive_location
   board_id: 'waveshare_rp2040_one'
 
 
@@ -13,7 +14,7 @@ tasks:
   .install:
     internal: true
     cmds:
-      - uv run circup --path {{ .path }} install --requirement requirements.txt
+      - uv run circup --path '{{ .path }}' install --requirement requirements.txt
       - uv run circuitpython_setboard {{ .board_id }}
 
   install:
@@ -47,16 +48,16 @@ tasks:
       - '{{ .patth }}/**/*'
     cmds:
       - task: install
-      - cp -vr src/* {{ .path }}
-      - mv {{ .path }}/main.py {{ .path }}/code.py
+      - cp -vr src/* '{{ .path }}'
+      - mv '{{ .path }}/main.py' '{{ .path }}/code.py'
 
   enable_drive:
     desc: Temporarily enable the drive, to allow uploading firmware.
     status:
       - test -d {{ .path }}
     cmds:
-      - uv run python control.py
-      - while ! test -d {{ .path }}; do sleep .1; done
+      - uv run python tools enable_drive
+      - while ! test -d '{{ .path }}'; do sleep .1; done
 
   lint:
     desc: Run linters.

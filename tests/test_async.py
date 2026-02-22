@@ -157,7 +157,15 @@ async def test_run_forever(async_sleep_mock):
 
 
 async def test_main(circuit_python_mocks, async_sleep_mock):
-    from src.config import drive_flag_file, jiggle_distance, serial_drive_enable_command, tickle_interval
+    circuit_python_mocks.os.getenv.side_effect = lambda key, default=None: dict(
+        drive_flag_file="drive_flag_file",
+        button_pin="button_pin",
+        button_activation="button_activation",
+        tickle_interval="tickle_interval",
+        jiggle_distance="jiggle_distance",
+        serial_drive_enable_command="serial_drive_enable_command",
+    ).get(key, default)
+
     from src.main import (
         jiggler,
         main,
@@ -179,15 +187,13 @@ async def test_main(circuit_python_mocks, async_sleep_mock):
 
     mouse_mock.assert_called_once_with(circuit_python_mocks.usb_hid.devices)
     setup_usb_mock.assert_called_once()
-    print_banner_mock.assert_called_once_with(
-        tickle_interval, jiggle_distance, serial_drive_enable_command
-    )
-    sch_mock.assert_called_once_with(serial_drive_enable_command)
+    print_banner_mock.assert_called_once_with("tickle_interval", "jiggle_distance", "serial_drive_enable_command")
+    sch_mock.assert_called_once_with("serial_drive_enable_command")
 
     run_forever_mock.assert_has_calls([
-        call(serial_usage_message, serial_drive_enable_command),
-        call(serial_command_handling, sch_mock.return_value, drive_flag_file),
-        call(jiggler, mouse_mock.return_value, tickle_interval, jiggle_distance)
+        call(serial_usage_message, "serial_drive_enable_command"),
+        call(serial_command_handling, sch_mock.return_value, "drive_flag_file"),
+        call(jiggler, mouse_mock.return_value, "tickle_interval", "jiggle_distance")
     ])
 
     aio_gather_mock.assert_called_once_with(*rf_results)

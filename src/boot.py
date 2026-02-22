@@ -6,37 +6,48 @@ import digitalio
 import storage
 import usb_cdc
 
-from config import (
-    button_active_low,
-    button_pin,
-    drive_flag_file,
-)
-
 
 def boot():
-    button_pin_object = getattr(board, button_pin, None)
-    button_value = not button_active_low
+    flag_file = os.getenv("drive_flag_file")
+    button_pin = os.getenv("button_pin")
+    button_activation = bool(os.getenv("button_activation", 0))
 
-    if button_pin_object:
-        enable_drive_button = digitalio.DigitalInOut(button_pin)
-        enable_drive_button.pull = digitalio.Pull.UP if button_active_low else digitalio.Pull.DOWN
-        time.sleep(1)
-        button_value = enable_drive_button.value
+    flag_file_exists = file_exists(flag_file)
+    button_pressed = is_button_active(button_pin, button_activation)
 
-    enable_drive_button_pressed = button_value ^ button_active_low
-    enable_drive_file_exists = False
+    if flag_file_exists:
+        try:
+            os.remove(flag_file)
+        except: # noqa: E722
+            pass
 
-    try:
-        enable_drive_file_exists = drive_flag_file in os.listdir("/")
-        os.remove(drive_flag_file)
-    except: # noqa: E722
-        pass
-
-    disable_drive = not (enable_drive_button_pressed or enable_drive_file_exists)
-
-    if disable_drive:
+    enable_drive = button_pressed or flag_file_exists
+    if not enable_drive:
         storage.disable_usb_drive()
         usb_cdc.enable(console=True, data=False)
+
+
+def is_button_active(pin_name: str, button_activation: bool = False) -> bool:
+    pin_object = getattr(board, pin_name, None)
+
+    if not pin_object:
+        return False
+
+    enable_drive_button = digitalio.DigitalInOut(pin_object)
+    enable_drive_button.pull = digitalio.Pull.DOWN if button_activation else digitalio.Pull.UP
+    time.sleep(1)
+
+    return enable_drive_button.value == button_activation
+
+
+def file_exists(path: str) -> bool:
+    if not path:
+        return False
+
+    try:
+        return path in os.listdir("/")
+    except: # noqa: E722
+        return False
 
 
 if __name__ == "__main__":
