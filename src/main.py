@@ -45,8 +45,8 @@ class SerialCommandHandler:
         if command == self.enable_command:
             return True
 
-        print("Unknown command: %s" % command)
-        print("Available commands: %s" % self.enable_command)
+        print(f"Unknown command: {command}")
+        print(f"Available commands: {self.enable_command}")
 
         return False
 
@@ -56,7 +56,7 @@ def min_sec_fmt(duration):
     duration = max(0, duration)  # Ensure non-negative
     mins = int(duration / 60)
     secs = int(duration % 60)
-    return "%dmin %dsec" % (mins, secs)
+    return f"{mins}min {secs}sec"
 
 
 def jiggle(mouse, distance: int = 1):
@@ -71,14 +71,14 @@ async def serial_command_handling(handler: SerialCommandHandler, flag_file: str)
         await asyncio.sleep(0.05)
         return
 
-    print("\n!!! Creating temporary flag file '%s' and rebooting..." % flag_file)
+    print(f"\n!!! Creating temporary flag file '{flag_file}' and rebooting...")
     print("!!! USB storage will be enabled for next boot only!")
 
     try:
         with open(flag_file, "w") as f:
             f.write("1")
     except Exception as e:
-        print("Could not open/create file %s, error: %s" % (flag_file, e))
+        print(f"Could not open/create file {flag_file}, error: {e}")
         return
 
     await asyncio.sleep(0.5)
@@ -87,7 +87,7 @@ async def serial_command_handling(handler: SerialCommandHandler, flag_file: str)
 
 async def serial_usage_message(enable_command: str):
     """Task to periodically print usage message."""
-    print("Send: '%s' - to reboot with temporarily enable USB storage" % enable_command)
+    print(f"Send: '{enable_command}' - to reboot with temporarily enable USB storage")
     await asyncio.sleep(30)
 
 
@@ -96,11 +96,11 @@ async def jiggler(mouse, interval: int, distance: int):
     print(" "*50, end="\r")
 
     while secs_to_go:
-        print("Next jiggle in %s... " % min_sec_fmt(secs_to_go), end="\r")
+        print(f"Next jiggle in {min_sec_fmt(secs_to_go)}... ", end="\r")
         secs_to_go -= 1
         await asyncio.sleep(1)
 
-    print("Next jiggle in %s... " % min_sec_fmt(secs_to_go), end="")
+    print(f"Next jiggle in {min_sec_fmt(secs_to_go)}... ", end="")
     print("Jiggle jiggle!", end="\r")
     jiggle(mouse, distance)
     await asyncio.sleep(1)
@@ -114,12 +114,9 @@ def setup_usb():
 def print_banner(interval: int, distance: int, enable_command: str):
     """Print startup banner."""
     print("Mouse jiggler started!\n")
-    print("Interval %s" % min_sec_fmt(interval))
-    print("Distance ±%dpx" % distance)
-    print(
-        "Serial command: '%s' - to reboot with temporarily enable USB storage"
-        % enable_command
-    )
+    print(f"Interval {min_sec_fmt(interval)}")
+    print(f"Distance ±{distance}px")
+    print(f"Serial command: '{enable_command}' - to reboot with temporarily enable USB storage")
     print("Enter main loop...\n")
 
 
