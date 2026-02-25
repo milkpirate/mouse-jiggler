@@ -38,9 +38,9 @@ def main(argv):
         return
 
     if opts["enable_drive"]:
-        serial_drive_enable_command = get_setting("serial_drive_enable_command")
-        with serial.Serial("COM15", 115200) as com:
-            com.write(f"{serial_drive_enable_command}\n".encode())
+        enable_drive_serial_command = get_setting("enable_drive_serial_command")
+        with serial.Serial("COM25", 115200) as com:
+            com.write(f"{enable_drive_serial_command}\n".encode())
 
 if __name__ == "__main__":
     main(sys.argv[1:])

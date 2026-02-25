@@ -104,3 +104,6 @@ def pwd():
     cwd = os.getcwd()
     print(cwd)
     return cwd
+
+def env():
+    return cat('/settings.toml')

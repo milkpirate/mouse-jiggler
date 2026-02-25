@@ -8,12 +8,16 @@ import usb_cdc
 
 
 def boot():
-    flag_file = os.getenv("drive_flag_file")
-    button_pin = os.getenv("button_pin")
+    flag_file = os.getenv("enable_drive_flag_file")
+    enable_drive_button_pin = os.getenv("enable_drive_button_pin")
+    disable_drive_by_default = bool(os.getenv("disable_drive_by_default", 0))
     button_activation = bool(os.getenv("button_activation", 0))
 
+    if not disable_drive_by_default:
+        return
+
     flag_file_exists = file_exists(flag_file)
-    button_pressed = is_button_active(button_pin, button_activation)
+    button_pressed = is_button_active(enable_drive_button_pin, button_activation)
 
     if flag_file_exists:
         try:

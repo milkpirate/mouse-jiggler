@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "A USB HID device, that tickles your mouse, to make it jiggle jiggle"
 requires-python = "==3.13.*"   # though circuitepython ~ python 3.4
 dependencies = [
+    "adafruit-circuitpython-asyncio>=3.0.3",
     "adafruit-circuitpython-ble>=10.1.0",
     "adafruit-circuitpython-hid>=6.1.8",
     "adafruit-circuitpython-neopixel>=6.3.21",

@@ -33,6 +33,19 @@ wheels = [
 ]
 
 [[package]]
+name = "adafruit-circuitpython-asyncio"
+version = "3.0.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "adafruit-blinka" },
+    { name = "adafruit-circuitpython-ticks" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ed/e4/3522be6f05e64081f1138500c0502480762864f0d8ae398ab287b614a124/adafruit_circuitpython_asyncio-3.0.3.tar.gz", hash = "sha256:77fec429407758bf536094aef9bef38ddd7ccd40b2e44a9ef97d8839de053bbd", size = 38701, upload-time = "2025-10-20T20:36:12.651Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/40/82/160ce68eaec9008057942485f560776398c2f354d1ce485f2b566d4ef1c9/adafruit_circuitpython_asyncio-3.0.3-py3-none-any.whl", hash = "sha256:6820144808a4f7b39a600c43a1a84d153c1e149d78ad535bd29b766bbb796c81", size = 19639, upload-time = "2025-10-20T20:36:10.486Z" },
+]
+
+[[package]]
 name = "adafruit-circuitpython-ble"
 version = "10.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -120,6 +133,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/f5/ae/ec54c3e224a012d620997604fdd6abdbff1b945df3b4aef43d780fd1d5c3/adafruit_circuitpython_requests-4.1.15.tar.gz", hash = "sha256:409cb1c9304a0ce0a4b2f64d572400007849f6972f92a4b08ebfe35a532761e7", size = 67841, upload-time = "2025-11-03T21:32:59.201Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/14/58/76a9805ff64d84a39463ac6eeb9c780becfc8ff58a93c5ace9244d56e442/adafruit_circuitpython_requests-4.1.15-py3-none-any.whl", hash = "sha256:62c6e44d23e8dfdc24f1f33464953019a9d88853b29fa471ac00200d4fa3e8ff", size = 10882, upload-time = "2025-11-03T21:32:57.915Z" },
+]
+
+[[package]]
+name = "adafruit-circuitpython-ticks"
+version = "1.1.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "adafruit-blinka" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c3/97/04f9604ddebe82e08a5a3aa69540a0de3733bbb504db5733f053e10eee78/adafruit_circuitpython_ticks-1.1.5.tar.gz", hash = "sha256:7e7524c50675cb45c8b055716551d4e914f855cff96eb248c7759d721d13867d", size = 23254, upload-time = "2025-10-20T20:47:03.897Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/66/1c/671fd6e3e1b04ab6966a6cd83c0fcf13663cc1b1b8c0a304337015a31223/adafruit_circuitpython_ticks-1.1.5-py3-none-any.whl", hash = "sha256:8c1fa227beb96aa659b20859a63c0e736022d10f7d25160d2f44f5284eb9fab4", size = 5413, upload-time = "2025-10-20T20:47:02.178Z" },
 ]
 
 [[package]]
@@ -451,6 +476,7 @@ name = "mouse-jiggler"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "adafruit-circuitpython-asyncio" },
     { name = "adafruit-circuitpython-ble" },
     { name = "adafruit-circuitpython-hid" },
     { name = "adafruit-circuitpython-neopixel" },
@@ -473,6 +499,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "adafruit-circuitpython-asyncio", specifier = ">=3.0.3" },
     { name = "adafruit-circuitpython-ble", specifier = ">=10.1.0" },
     { name = "adafruit-circuitpython-hid", specifier = ">=6.1.8" },
     { name = "adafruit-circuitpython-neopixel", specifier = ">=6.3.21" },

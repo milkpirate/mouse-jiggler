@@ -62,7 +62,7 @@ async def test_serial_usage_message_task(capsys, async_sleep_mock, enable_cmd):
     )
 )
 async def test_serial_command_handling_task(
-    capsys, tmpfile, async_sleep_mock, circuit_python_mocks,
+    capsys, tmpfile, async_sleep_mock, cyp_mocks,
     command_received, wait_duration, expected_flag_file_content
 ):
     from src.main import serial_command_handling
@@ -77,7 +77,7 @@ async def test_serial_command_handling_task(
 
     if command_received:
         handler_mock.command_received.assert_awaited_once()
-        circuit_python_mocks.microcontroller.reset.assert_called_once()
+        cyp_mocks.microcontroller.reset.assert_called_once()
 
         assert (
             f"\n!!! Creating temporary flag file {tmpfile.__str__()!r} and rebooting...\n"
@@ -85,7 +85,7 @@ async def test_serial_command_handling_task(
         ) == stdout
     else:
         handler_mock.command_received.assert_awaited_once()
-        circuit_python_mocks.microcontroller.assert_not_called()
+        cyp_mocks.microcontroller.assert_not_called()
 
     async_sleep_mock.assert_awaited_once_with(wait_duration)
     assert tmpfile.read_text() == expected_flag_file_content, "Flag file content mismatch"
@@ -156,14 +156,14 @@ async def test_run_forever(async_sleep_mock):
     )
 
 
-async def test_main(circuit_python_mocks, async_sleep_mock):
-    circuit_python_mocks.os.getenv.side_effect = lambda key, default=None: dict(
-        drive_flag_file="drive_flag_file",
-        button_pin="button_pin",
+async def test_main(cyp_mocks, async_sleep_mock):
+    cyp_mocks.os.getenv.side_effect = lambda key, default=None: dict(
+        enable_drive_flag_file="enable_drive_flag_file",
+        enable_drive_button_pin="enable_drive_button_pin",
         button_activation="button_activation",
         tickle_interval="tickle_interval",
         jiggle_distance="jiggle_distance",
-        serial_drive_enable_command="serial_drive_enable_command",
+        enable_drive_serial_command="enable_drive_serial_command",
     ).get(key, default)
 
     from src.main import (
@@ -185,14 +185,14 @@ async def test_main(circuit_python_mocks, async_sleep_mock):
         run_forever_mock.side_effect = rf_results
         await main()
 
-    mouse_mock.assert_called_once_with(circuit_python_mocks.usb_hid.devices)
+    mouse_mock.assert_called_once_with(cyp_mocks.usb_hid.devices)
     setup_usb_mock.assert_called_once()
-    print_banner_mock.assert_called_once_with("tickle_interval", "jiggle_distance", "serial_drive_enable_command")
-    sch_mock.assert_called_once_with("serial_drive_enable_command")
+    print_banner_mock.assert_called_once_with("tickle_interval", "jiggle_distance", "enable_drive_serial_command")
+    sch_mock.assert_called_once_with("enable_drive_serial_command")
 
     run_forever_mock.assert_has_calls([
-        call(serial_usage_message, "serial_drive_enable_command"),
-        call(serial_command_handling, sch_mock.return_value, "drive_flag_file"),
+        call(serial_usage_message, "enable_drive_serial_command"),
+        call(serial_command_handling, sch_mock.return_value, "enable_drive_flag_file"),
         call(jiggler, mouse_mock.return_value, "tickle_interval", "jiggle_distance")
     ])
 

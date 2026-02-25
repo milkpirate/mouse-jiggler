@@ -1,6 +1,7 @@
 # Mouse Jiggler
 ![Tests](https://img.shields.io/endpoint?url=https%3A%2F%2Fgist.githubusercontent.com%2Fmilkpirate%2Fc2389bbe0a2312450ec9358e81f1b0e8%2Fraw%2F28a36edb66f16a3143a0b162bbfb828ea35ca044%2Fmouse-jiggler-junit-tests.json)
 ![Coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fgist.githubusercontent.com%2Fmilkpirate%2Fc2389bbe0a2312450ec9358e81f1b0e8%2Fraw%2F28a36edb66f16a3143a0b162bbfb828ea35ca044%2Fmouse-jiggler-cobertura-coverage.json)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 ![GitHub License](https://img.shields.io/github/license/milkpirate/mouse-jiggler)
 
 Hardware mouse jiggler based on Raspberry Pi Pico and [CircuitPython](https://circuitpython.org/).

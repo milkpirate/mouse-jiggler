@@ -2,11 +2,12 @@
 # See https://docs.circuitpython.org/en/latest/docs/environment.html for more info on how to use this file.
 
 # Hardware settings
-drive_flag_file = "usb_drive.enable"
-serial_drive_enable_command = "enable_usb_reboot"
-button_pin = "GP28"
+disable_drive_by_default = 0
+enable_drive_flag_file = "usb_drive.enable"
+enable_drive_serial_command = "enable_usb_reboot"
+enable_drive_button_pin = "GP29"
 # 1 = active high, 0 = active low
-button_activation = 0
+button_activation = 1
 
 # Ticker settings
 # 5 minutes

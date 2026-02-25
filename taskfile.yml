@@ -2,9 +2,9 @@ version: '3'
 
 
 vars:
+  board_id: 'waveshare_rp2040_one'
   path:
     sh: uv run python tools setting circuit_python_drive_location
-  board_id: 'waveshare_rp2040_one'
 
 
 interval: 500ms
@@ -16,6 +16,15 @@ tasks:
     cmds:
       - uv run circup --path '{{ .path }}' install --requirement requirements.txt
       - uv run circuitpython_setboard {{ .board_id }}
+
+  prime:
+    desc: Prepare the board with Circuitpython.
+    vars:
+      cpy_version:
+        sh: curl -sL  https://api.github.com/repos/adafruit/circuitpython/releases/latest | yq .tag_name
+    cmds:
+      - curl -L https://adafruit-circuit-python.s3.amazonaws.com/bin/{{ .board_id }}/en_US/adafruit-circuitpython-{{ .board_id }}-en_US-{{ .cpy_version }}.uf2
+        -o {{ .path }}/circuitpython.uf2
 
   install:
     desc: Install dependencies.

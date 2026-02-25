@@ -10,7 +10,7 @@ import pytest
 
 
 @pytest.fixture(autouse=True)
-def circuit_python_mocks():
+def cyp_mocks():
     modules = {name: MagicMock() for name in [
         "board",
         "storage",

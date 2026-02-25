@@ -9,13 +9,13 @@ from adafruit_hid.mouse import Mouse
 
 
 class SerialCommandHandler:
-    """Handles serial command processing with StreamReader."""
+    """Handles serial command processing."""
 
     def __init__(self, enable_command: str):
         self.enable_command = enable_command
-        self.reader = asyncio.StreamReader()
+        self.buffer = b""
 
-    def _fill_reader(self):
+    def _fill_buffer(self):
         if not (available_bytes := supervisor.runtime.serial_bytes_available):
             return False
 
@@ -25,33 +25,35 @@ class SerialCommandHandler:
         if isinstance(chunk, str):
             chunk = chunk.encode()
 
-        self.reader.feed_data(chunk)
+        self.buffer += chunk
         return True
 
-    async def _read_out(self):
-        try:
-            line = await asyncio.wait_for(self.reader.readline(), timeout=0.01)
-        except asyncio.TimeoutError:
-            return None
-        except Exception as e:
-            print(f"Error reading from serial: {e}")
+    def _extract_first_complete_line(self):
+        """Extract a line from buffer if available."""
+        if not self.buffer:
             return None
 
+        if b"\n" not in self.buffer:
+            return None
+
+        line, self.buffer = self.buffer.split(b"\n", 1)
         return line.decode().strip()
 
     async def command_received(self) -> bool:
         """Process available serial data. Returns True if command matches enable_command."""
-        if not self._fill_reader():
+        if not self._fill_buffer():
+            await asyncio.sleep(0.001)
             return False
 
-        if (line := await self._read_out()) is None:
+        line = self._extract_first_complete_line()
+        if line is None:
             return False
 
         if line == self.enable_command:
             return True
 
         print(f"Unknown command: {line!r}")
-        print(f"Available commands: {self.enable_command}")
+        print(f"Available commands: {self.enable_command!r}")
         return False
 
 
@@ -137,16 +139,16 @@ async def main():
 
     tickle_interval = os.getenv("tickle_interval")
     jiggle_distance = os.getenv("jiggle_distance")
-    drive_flag_file = os.getenv("drive_flag_file")
-    serial_drive_enable_command = os.getenv("serial_drive_enable_command")
+    enable_drive_flag_file = os.getenv("enable_drive_flag_file")
+    enable_drive_serial_command = os.getenv("enable_drive_serial_command")
 
     await asyncio.sleep(5)
-    print_banner(tickle_interval, jiggle_distance, serial_drive_enable_command)
-    handler = SerialCommandHandler(serial_drive_enable_command)
+    print_banner(tickle_interval, jiggle_distance, enable_drive_serial_command)
+    handler = SerialCommandHandler(enable_drive_serial_command)
 
     await asyncio.gather(
-        run_forever(serial_usage_message, serial_drive_enable_command),
-        run_forever(serial_command_handling, handler, drive_flag_file),
+        run_forever(serial_usage_message, enable_drive_serial_command),
+        run_forever(serial_command_handling, handler, enable_drive_flag_file),
         run_forever(jiggler, mouse, tickle_interval, jiggle_distance)
     )
 
