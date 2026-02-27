@@ -26,6 +26,8 @@ class SerialCommandHandler:
         if not (chunk := sys.stdin.read(available_bytes)):
             return False
 
+        print(chunk, end="")
+
         if isinstance(chunk, str):
             chunk = chunk.encode()
 
@@ -157,7 +159,6 @@ async def main():
     led_active_low = bool(os.getenv("led_active_low", 0))
     tickle_interval = os.getenv("tickle_interval")
     jiggle_distance = os.getenv("jiggle_distance")
-    enable_drive_flag_file = os.getenv("enable_drive_flag_file")
     enable_drive_serial_command = os.getenv("enable_drive_serial_command")
 
     if led := setup_led(led_pin, led_active_low):
@@ -171,7 +172,7 @@ async def main():
 
     await asyncio.gather(
         run_forever(serial_usage_message, enable_drive_serial_command),
-        run_forever(serial_command_handling, handler, enable_drive_flag_file),
+        run_forever(serial_command_handling, handler),
         run_forever(jiggler, mouse, tickle_interval, jiggle_distance, led),
     )
 

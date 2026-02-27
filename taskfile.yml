@@ -29,7 +29,7 @@ tasks:
   install:
     desc: Install dependencies.
     cmds:
-      - task: enable_drive
+      - task: enable_drives
       - task: .install
 
   dist:
@@ -47,25 +47,28 @@ tasks:
       - mv {{ .temp_dir }}/main.py {{ .temp_dir }}/code.py
       - rm -rv {{ .temp_dir }}/boot_out.txt
 
-  upload:
+  upload:*:
     desc: Upload firmware to the board.
-    deps:
-      - enable_drive
+    vars:
+      path: '{{ (.MATCH | first) | default .path }}'
+    aliases:
+      - upload
     sources:
       - 'src/**/*'
     generates:
       - '{{ .patth }}/**/*'
     cmds:
+      - task: enable_drives
       - task: install
       - cp -vr src/* '{{ .path }}'
       - mv '{{ .path }}/main.py' '{{ .path }}/code.py'
 
-  enable_drive:
+  enable_drives:
     desc: Temporarily enable the drive, to allow uploading firmware.
     status:
       - test -d '{{ .path }}'
     cmds:
-      - uv run python tools enable_drive
+      - uv run python tools enable_drives
       - while ! test -d '{{ .path }}'; do sleep .1; done
 
   lint:

@@ -152,7 +152,6 @@ async def test_setup_led(cpy_mocks, led_pin, led_inverted):
 @pytest.mark.parametrize("led_active", (0, 1))
 async def test_main(cpy_mocks, async_sleep_mock, led_pin, led_active):
     cpy_mocks.os.getenv.side_effect = lambda key, default=None: dict(
-        enable_drive_flag_file="enable_drive_flag_file",
         enable_drive_button_pin="enable_drive_button_pin",
         button_activation="button_activation",
         tickle_interval="tickle_interval",
@@ -198,7 +197,7 @@ async def test_main(cpy_mocks, async_sleep_mock, led_pin, led_active):
 
     run_forever_mock.assert_has_calls([
         call(serial_usage_message, "enable_drive_serial_command"),
-        call(serial_command_handling, sch_mock.return_value, "enable_drive_flag_file"),
+        call(serial_command_handling, sch_mock.return_value),
         call(jiggler, mouse_mock.return_value, "tickle_interval", "jiggle_distance", setup_led_mock.return_value)
     ])
 
