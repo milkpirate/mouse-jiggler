@@ -10,7 +10,7 @@ import pytest
 
 
 @pytest.fixture(autouse=True)
-def cyp_mocks():
+def cpy_mocks():
     modules = {name: MagicMock() for name in [
         "board",
         "storage",
@@ -19,12 +19,16 @@ def cyp_mocks():
         "digitalio",
         "time",
         "os",
+        "pwmio",
         "supervisor",
         "microcontroller",
     ]}
 
+    ns_modules = SimpleNamespace(**modules)
+    ns_modules.microcontroller.nvm = bytearray(16)  # Default nvm size for tests
+
     with patch.dict(sys.modules, modules):
-        yield SimpleNamespace(**modules)
+        yield ns_modules
 
 
 @pytest.fixture

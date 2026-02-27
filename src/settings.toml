@@ -2,12 +2,14 @@
 # See https://docs.circuitpython.org/en/latest/docs/environment.html for more info on how to use this file.
 
 # Hardware settings
-disable_drive_by_default = 0
+enable_drive_by_default = 1
 enable_drive_flag_file = "usb_drive.enable"
 enable_drive_serial_command = "enable_usb_reboot"
 enable_drive_button_pin = "GP29"
 # 1 = active high, 0 = active low
 button_activation = 1
+led_pin = "GP22"
+led_active_low = 1
 
 # Ticker settings
 # 5 minutes
@@ -16,4 +18,5 @@ tickle_interval = 300
 jiggle_distance = 1
 
 # Host settings
-circuit_python_drive_location = "G:\\"
+cyp_drive_location = "G:\\"
+cyp_serial_port = "COM21"

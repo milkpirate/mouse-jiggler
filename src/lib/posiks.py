@@ -3,7 +3,36 @@
 import os
 import time
 
-import microcontroller
+import microcontroller as mcu
+import storage as stor
+
+
+def ls(path: str = '.'):
+    """List files in a directory with details (like ls -la)."""
+    lst = os.listdir(path)
+
+    entries = []
+
+    for item in lst:
+        item_path = path + os.sep + item
+        stat_info = os.stat(item_path)
+        is_dir = _is_dir(item_path)
+
+        size = stat_info[6]
+        mtime = time.localtime(stat_info[8])
+        mtime_str = f"{mtime[0]}-{mtime[1]:02d}-{mtime[2]:02d} {mtime[3]:02d}:{mtime[4]:02d}"
+        size_str = _format_size(size)
+
+        name = item + (os.sep if is_dir else "")
+        entries.append((name, is_dir, size_str, mtime_str))
+
+    # Sort directories first, then files
+    entries.sort(key=lambda x: (not x[1], x[0]))
+
+    for name, is_dir, size_str, mtime_str in entries:
+        print(f"{size_str} {mtime_str} {name}")
+
+    return lst
 
 
 def _rjust(s: str, width: int) -> str:
@@ -53,34 +82,6 @@ def rmdir(path: str):
     os.rmdir(path)
 
 
-def ls(path: str = '.'):
-    """List files in a directory with details (like ls -la)."""
-    lst = os.listdir(path)
-
-    entries = []
-
-    for item in lst:
-        item_path = path + os.sep + item
-        stat_info = os.stat(item_path)
-        is_dir = _is_dir(item_path)
-
-        size = stat_info[6]
-        mtime = time.localtime(stat_info[8])
-        mtime_str = f"{mtime[0]}-{mtime[1]:02d}-{mtime[2]:02d} {mtime[3]:02d}:{mtime[4]:02d}"
-        size_str = _format_size(size)
-
-        name = item + (os.sep if is_dir else "")
-        entries.append((name, is_dir, size_str, mtime_str))
-
-    # Sort directories first, then files
-    entries.sort(key=lambda x: (not x[1], x[0]))
-
-    for name, is_dir, size_str, mtime_str in entries:
-        print(f"{size_str} {mtime_str} {name}")
-
-    return lst
-
-
 def touch(path: str):
     """Create an empty file or update its timestamp."""
     with open(path, "a"):
@@ -89,7 +90,7 @@ def touch(path: str):
 
 def reboot():
     """Reboot the system."""
-    microcontroller.reset()
+    mcu.reset()
 
 
 def uname():
@@ -105,5 +106,14 @@ def pwd():
     print(cwd)
     return cwd
 
+
 def env():
     return cat('/settings.toml')
+
+
+def fmt():
+    stor.erase_filesystem()
+
+
+def rwmount():
+    stor.remount("/", readonly=False)

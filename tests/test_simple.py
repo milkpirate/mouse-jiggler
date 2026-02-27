@@ -43,13 +43,13 @@ def test_jiggle(mouse_mock, distance):
     ], any_order=False)
 
 
-def test_setup_usb(cyp_mocks):
+def test_setup_usb(cpy_mocks):
     from src.main import setup_usb
 
     setup_usb()
 
-    cyp_mocks.supervisor.set_usb_identification.assert_called_once_with("CPY", "Mouse MJ2040")
-    cyp_mocks.usb_hid.set_interface_name.assert_called_once_with("CPY Mouse MJ2040")
+    cpy_mocks.supervisor.set_usb_identification.assert_called_once_with("CPY", "Mouse MJ2040")
+    cpy_mocks.usb_hid.set_interface_name.assert_called_once_with("CPY Mouse MJ2040")
 
 
 def test_print_banner(capsys):

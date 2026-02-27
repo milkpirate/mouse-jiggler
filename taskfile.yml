@@ -4,7 +4,7 @@ version: '3'
 vars:
   board_id: 'waveshare_rp2040_one'
   path:
-    sh: uv run python tools setting circuit_python_drive_location
+    sh: uv run python tools setting cyp_drive_location
 
 
 interval: 500ms

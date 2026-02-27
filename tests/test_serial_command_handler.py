@@ -24,12 +24,12 @@ def test_SerialCommandHandler_init():  # noqa: N802
         (4, "\n\n", True),
     ]
 )
-def test_SerialCommandHandler__fill_reader(cyp_mocks, available_bytes, read_data, expected_result):  # noqa: N802
+def test_SerialCommandHandler__fill_reader(cpy_mocks, available_bytes, read_data, expected_result):  # noqa: N802
     from src.main import SerialCommandHandler
     sch = SerialCommandHandler("cmd")
 
     with patch("main.sys.stdin.read") as stdin_read_mock:
-        cyp_mocks.supervisor.runtime.serial_bytes_available = available_bytes
+        cpy_mocks.supervisor.runtime.serial_bytes_available = available_bytes
         stdin_read_mock.return_value = read_data
 
         assert sch._fill_buffer() == expected_result
@@ -54,7 +54,7 @@ def test_SerialCommandHandler__fill_reader(cyp_mocks, available_bytes, read_data
     ]
 )
 def test_SerialCommandHandler__extract_first_complete_line(    # noqa: N802
-    capsys, cyp_mocks,
+    capsys, cpy_mocks,
     stdin, stdout, read_out, buffer
 ):
     from src.main import SerialCommandHandler
@@ -77,7 +77,7 @@ def test_SerialCommandHandler__extract_first_complete_line(    # noqa: N802
     ]
 )
 async def test_SerialCommandHandler_command_received(  # noqa: N802
-    capsys, cyp_mocks,
+    capsys, cpy_mocks,
     _fill_buffer, line, stdout, command_received
 ):
     from src.main import SerialCommandHandler

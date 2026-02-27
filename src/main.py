@@ -2,10 +2,14 @@ import asyncio
 import os
 import sys
 
+import board
 import microcontroller
 import supervisor
 import usb_hid
 from adafruit_hid.mouse import Mouse
+
+from lib.led import LED
+from lib.nvm import enable_drive
 
 
 class SerialCommandHandler:
@@ -71,21 +75,16 @@ def jiggle(mouse, distance: int = 1):
     mouse.move(x=-distance)
 
 
-async def serial_command_handling(handler: SerialCommandHandler, flag_file: str):
+async def serial_command_handling(handler: SerialCommandHandler):
     """Task to process serial commands."""
     if not await handler.command_received():
         await asyncio.sleep(0.05)
         return
 
-    print(f"\n!!! Creating temporary flag file {flag_file!r} and rebooting...")
-    print("!!! USB storage will be enabled for next boot only!")
+    print("!!! USB storage will be enabled for next boot only !!!")
+    print("Rebooting now...")
 
-    try:
-        with open(flag_file, "w") as f:
-            f.write("1")
-    except Exception as e:
-        print(f"Could not open/create file {flag_file}, error: {e}")
-        return
+    enable_drive(True)
 
     await asyncio.sleep(0.5)
     microcontroller.reset()
@@ -97,19 +96,28 @@ async def serial_usage_message(enable_command: str):
     await asyncio.sleep(30)
 
 
-async def jiggler(mouse, interval: int, distance: int):
+async def jiggler(mouse, interval: int, distance: int, led: LED = None):
     secs_to_go = interval
     print(" "*50, end="\r")
 
     while secs_to_go:
         print(f"Next jiggle in {min_sec_fmt(secs_to_go)}... ", end="\r")
         secs_to_go -= 1
-        await asyncio.sleep(1)
+
+        if led:
+            await led.fade(to_value=1000, from_value=0, duration=0.5)
+            await led.fade(to_value=0, from_value=1000, duration=0.5)
+        else:
+            await asyncio.sleep(1)
 
     print(f"Next jiggle in {min_sec_fmt(secs_to_go)}... ", end="")
     print("Jiggle jiggle!", end="\r")
     jiggle(mouse, distance)
-    await asyncio.sleep(1)
+
+    if led:
+        await led.blink_for(interval=0.25, duration=1)
+    else:
+        await asyncio.sleep(1)
 
 
 def setup_usb():
@@ -133,23 +141,38 @@ async def run_forever(coro_func, *a, **kw):
         await asyncio.sleep(0)
 
 
+def setup_led(pin_name: str, inverted: bool) -> LED | None:
+    if not pin_name:
+        return None
+
+    pin = getattr(board, pin_name)
+    return LED(pin, inverted=inverted, reduce_to=500)
+
+
 async def main():
     mouse = Mouse(usb_hid.devices)
     setup_usb()
 
+    led_pin = os.getenv("led_pin")
+    led_active_low = bool(os.getenv("led_active_low", 0))
     tickle_interval = os.getenv("tickle_interval")
     jiggle_distance = os.getenv("jiggle_distance")
     enable_drive_flag_file = os.getenv("enable_drive_flag_file")
     enable_drive_serial_command = os.getenv("enable_drive_serial_command")
 
-    await asyncio.sleep(5)
+    if led := setup_led(led_pin, led_active_low):
+        led.off()
+        await led.fade(to_value=1000, duration=5)
+    else:
+        await asyncio.sleep(5)
+
     print_banner(tickle_interval, jiggle_distance, enable_drive_serial_command)
     handler = SerialCommandHandler(enable_drive_serial_command)
 
     await asyncio.gather(
         run_forever(serial_usage_message, enable_drive_serial_command),
         run_forever(serial_command_handling, handler, enable_drive_flag_file),
-        run_forever(jiggler, mouse, tickle_interval, jiggle_distance)
+        run_forever(jiggler, mouse, tickle_interval, jiggle_distance, led),
     )
 
 
