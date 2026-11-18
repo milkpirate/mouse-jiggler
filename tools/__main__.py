@@ -27,7 +27,7 @@ sys.path.append(self.parent.parent.__str__())
 settings_file = self.parent.parent / "src/settings.toml"
 
 
-cyp = SimpleNamespace(
+cpy = SimpleNamespace(
     vid=0x2e8a,
     pid=0x103a,
 )
@@ -51,7 +51,7 @@ def main(argv):
 
 
 def get_cpy_serial_ports():
-    return find_serial_port(vid=cyp.vid, pid=cyp.pid)
+    return find_serial_port(vid=cpy.vid, pid=cpy.pid)
 
 
 def find_serial_port(vid, pid) -> list[ListPortInfo]:
@@ -66,10 +66,10 @@ def get_setting(key: str, default: any =None):
     settings_content = settings_file.read_text()
     settings = toml.loads(settings_content)
 
-    if not (value := settings.get(key, default)):
+    if key not in settings and default is None:
         raise ValueError(f"Setting '{key}' not found in settings.toml")
 
-    return value
+    return settings.get(key, default)
 
 
 if __name__ == "__main__":

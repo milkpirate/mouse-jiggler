@@ -51,6 +51,7 @@ def test_SerialCommandHandler__fill_reader(cpy_mocks, available_bytes, read_data
             "line_data",
             "some other line\n\nand even more".encode()
         ),
+        (b"\xff\nrest", "", "", b"rest"),  # invalid UTF-8 must not raise
     ]
 )
 def test_SerialCommandHandler__extract_first_complete_line(    # noqa: N802
@@ -83,9 +84,34 @@ async def test_SerialCommandHandler_command_received(  # noqa: N802
     from src.main import SerialCommandHandler
 
     sch = SerialCommandHandler("cmd")
-    sch.buffer = line
+    sch.buffer = b""
     sch._fill_buffer = MagicMock(return_value=_fill_buffer)
     sch._extract_first_complete_line = MagicMock(return_value=line)
 
     assert await sch.command_received() == command_received
     assert capsys.readouterr() == (stdout, "")
+
+
+async def test_SerialCommandHandler_command_received_pending_lines(capsys, cpy_mocks):  # noqa: N802
+    from src.main import SerialCommandHandler
+
+    sch = SerialCommandHandler("cmd")
+    sch.buffer = b"foo\ncmd\n"
+    sch._fill_buffer = MagicMock(return_value=False)  # no new serial data
+
+    assert await sch.command_received() is False
+    assert await sch.command_received() is True, "Buffered command must be processed without new data"
+    assert sch.buffer == b""
+
+
+def test_SerialCommandHandler__fill_buffer_bounded(cpy_mocks):  # noqa: N802
+    from src.main import SerialCommandHandler
+
+    sch = SerialCommandHandler("cmd")
+    sch.buffer = b"x" * 200
+
+    with patch("main.sys.stdin.read", return_value="yz"):
+        cpy_mocks.supervisor.runtime.serial_bytes_available = 2
+        assert sch._fill_buffer()
+
+    assert sch.buffer == b"x" * 126 + b"yz"

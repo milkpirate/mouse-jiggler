@@ -14,7 +14,7 @@ def ls(path: str = '.'):
     entries = []
 
     for item in lst:
-        item_path = path + os.sep + item
+        item_path = path.rstrip(os.sep) + os.sep + item
         stat_info = os.stat(item_path)
         is_dir = _is_dir(item_path)
 
@@ -48,7 +48,7 @@ def _format_size(size: int) -> str:
             if unit == 'B':
                 return _rjust(str(size), 5)
             return _rjust(f"{size:.1f}{unit}", 5)
-        size //= 1024
+        size /= 1024
     return _rjust(f"{size:.1f}TB", 5)
 
 

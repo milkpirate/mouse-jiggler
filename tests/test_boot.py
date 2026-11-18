@@ -30,10 +30,18 @@ def test_is_button_active(cpy_mocks, button_activation, pin_object, button_value
         cpy_mocks.digitalio.DigitalInOut.assert_called_once_with(pin_object)
 
 
+@pytest.mark.parametrize("pin_name", (None, ""))
+def test_is_button_active_no_pin(cpy_mocks, pin_name):
+    from boot import is_button_active
+
+    assert is_button_active(pin_name) is False
+    cpy_mocks.digitalio.DigitalInOut.assert_not_called()
+
+
 @pytest.mark.parametrize(
     "enable_drive_by_default", [
-        True,   # if drive should be enabled by default, should call enable_drive with False to ensure drive is enabled
-        False,  # if drive should not be enabled by default, should not call enable_drive
+        True,   # drive enabled by default, NVM flag must still be consumed
+        False,  # drive disabled by default, NVM flag must be consumed
     ],
 )
 def test_boot_enable_drive_by_default(
@@ -41,10 +49,10 @@ def test_boot_enable_drive_by_default(
     enable_drive_by_default
 ):
     cpy_mocks.os.remove.side_effect = None
-    cpy_mocks.os.getenv.side_effect = lambda key, default=None: dict(
+    cpy_mocks.supervisor.get_setting.side_effect = lambda key, default=None: dict(
         enable_drive_button_pin="enable_drive_button_pin",
-        button_activation="button_activation",
-        enable_drive_by_default=int(enable_drive_by_default),
+        button_activation=True,
+        enable_drive_by_default=enable_drive_by_default,
     ).get(key, default)
 
     from boot import boot
@@ -55,14 +63,11 @@ def test_boot_enable_drive_by_default(
     ):
         boot()
 
-    cpy_mocks.os.getenv.assert_any_call("enable_drive_button_pin")
-    cpy_mocks.os.getenv.assert_any_call("button_activation", 0)
-    cpy_mocks.os.getenv.assert_any_call("enable_drive_by_default", 0)
+    cpy_mocks.supervisor.get_setting.assert_any_call("enable_drive_button_pin")
+    cpy_mocks.supervisor.get_setting.assert_any_call("button_activation", False)
+    cpy_mocks.supervisor.get_setting.assert_any_call("enable_drive_by_default", False)
 
-    if enable_drive_by_default:
-        enable_drive_mock.assert_not_called()
-    else:
-        enable_drive_mock.assert_called_once_with(int(enable_drive_by_default))
+    enable_drive_mock.assert_called_once_with(False)
 
 
 @pytest.mark.parametrize(
@@ -77,10 +82,10 @@ def test_boot(
     cpy_mocks, mouse_mock, async_sleep_mock,
     button_pressed, nvm_enable_drive, must_enable_drive
 ):
-    cpy_mocks.os.getenv.side_effect = lambda key, default=None: dict(
+    cpy_mocks.supervisor.get_setting.side_effect = lambda key, default=None: dict(
         enable_drive_button_pin="enable_drive_button_pin",
-        button_activation="button_activation",
-        enable_drive_by_default=0,
+        button_activation=True,
+        enable_drive_by_default=False,
     ).get(key, default)
 
     from boot import boot
@@ -95,9 +100,9 @@ def test_boot(
 
         is_button_active_mock.assert_called_once_with("enable_drive_button_pin", True)
 
-    cpy_mocks.os.getenv.assert_any_call("enable_drive_button_pin")
-    cpy_mocks.os.getenv.assert_any_call("button_activation", 0)
-    cpy_mocks.os.getenv.assert_any_call("enable_drive_by_default", 0)
+    cpy_mocks.supervisor.get_setting.assert_any_call("enable_drive_button_pin")
+    cpy_mocks.supervisor.get_setting.assert_any_call("button_activation", False)
+    cpy_mocks.supervisor.get_setting.assert_any_call("enable_drive_by_default", False)
 
     if must_enable_drive:
         cpy_mocks.storage.disable_usb_drive.assert_not_called()

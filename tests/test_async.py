@@ -1,5 +1,6 @@
 """Tests for formatting and utility functions."""
 import asyncio
+import itertools
 from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import pytest
@@ -14,7 +15,8 @@ import pytest
         (10, 4, AsyncMock())
     )
 )
-async def test_jiggler(capsys, mouse_mock, async_sleep_mock, interval, distance, led):
+async def test_jiggler(capsys, cpy_mocks, mouse_mock, async_sleep_mock, interval, distance, led):
+    cpy_mocks.time.monotonic.side_effect = itertools.chain([0], itertools.count())
     from src.main import jiggler
 
     with patch("src.main.jiggle", MagicMock()) as jiggle_mock:
@@ -94,7 +96,7 @@ async def test_serial_command_handling_task(
         ) == stdout
     else:
         handler_mock.command_received.assert_awaited_once()
-        cpy_mocks.microcontroller.assert_not_called()
+        cpy_mocks.microcontroller.reset.assert_not_called()
 
     async_sleep_mock.assert_awaited_once_with(wait_duration)
     assert enable_drive == exp_nvm, "Flag file content mismatch"
@@ -148,17 +150,45 @@ async def test_setup_led(cpy_mocks, led_pin, led_inverted):
             assert led is None
 
 
+async def test_setup_led_unknown_pin(cpy_mocks):
+    from src.main import setup_led
+
+    cpy_mocks.board.MISSING = None
+    with patch("src.main.LED") as led_mock:
+        assert setup_led("MISSING", inverted=False) is None
+
+    led_mock.assert_not_called()
+
+
+async def test_main_defaults(cpy_mocks, async_sleep_mock):
+    cpy_mocks.supervisor.get_setting.side_effect = lambda key, default=None: default
+
+    from src.main import main
+
+    with (
+        patch("src.main.Mouse"),
+        patch("src.main.setup_usb"),
+        patch("src.main.print_banner") as print_banner_mock,
+        patch("src.main.SerialCommandHandler"),
+        patch("src.main.asyncio.gather", AsyncMock()),
+        patch("src.main.run_forever"),
+    ):
+        await main()
+
+    print_banner_mock.assert_called_once_with(300, 1, "enable_usb_reboot")
+
+
 @pytest.mark.parametrize("led_pin", (None, "LED"))
 @pytest.mark.parametrize("led_active", (0, 1))
 async def test_main(cpy_mocks, async_sleep_mock, led_pin, led_active):
-    cpy_mocks.os.getenv.side_effect = lambda key, default=None: dict(
+    cpy_mocks.supervisor.get_setting.side_effect = lambda key, default=None: dict(
         enable_drive_button_pin="enable_drive_button_pin",
-        button_activation="button_activation",
-        tickle_interval="tickle_interval",
-        jiggle_distance="jiggle_distance",
+        button_activation=True,
+        tickle_interval=300,
+        jiggle_distance=1,
         enable_drive_serial_command="enable_drive_serial_command",
         led_pin=led_pin,
-        led_active_low=led_active,
+        led_active_low=bool(led_active),
     ).get(key, default)
 
     from src.main import (
@@ -191,14 +221,14 @@ async def test_main(cpy_mocks, async_sleep_mock, led_pin, led_active):
 
     mouse_mock.assert_called_once_with(cpy_mocks.usb_hid.devices)
     setup_usb_mock.assert_called_once()
-    print_banner_mock.assert_called_once_with("tickle_interval", "jiggle_distance", "enable_drive_serial_command")
+    print_banner_mock.assert_called_once_with(300, 1, "enable_drive_serial_command")
     sch_mock.assert_called_once_with("enable_drive_serial_command")
     setup_led_mock.assert_called_once_with(led_pin, bool(led_active))
 
     run_forever_mock.assert_has_calls([
         call(serial_usage_message, "enable_drive_serial_command"),
         call(serial_command_handling, sch_mock.return_value),
-        call(jiggler, mouse_mock.return_value, "tickle_interval", "jiggle_distance", setup_led_mock.return_value)
+        call(jiggler, mouse_mock.return_value, 300, 1, setup_led_mock.return_value)
     ])
 
     aio_gather_mock.assert_called_once_with(*rf_results)

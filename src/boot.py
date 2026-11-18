@@ -1,34 +1,32 @@
-import os
 import time
 
 import board
 import digitalio
 import storage
+import supervisor
 import usb_cdc
 
 from lib.nvm import enable_drive
 
 
 def boot():
-    enable_drive_button_pin = os.getenv("enable_drive_button_pin")
-    enable_drive_by_default = bool(os.getenv("enable_drive_by_default", 0))
-    button_activation = bool(os.getenv("button_activation", 0))
+    enable_drive_button_pin = supervisor.get_setting("enable_drive_button_pin")
+    enable_drive_by_default = supervisor.get_setting("enable_drive_by_default", False)
+    button_activation = supervisor.get_setting("button_activation", False)
+
+    drive_requested = bool(enable_drive)
+    enable_drive(False)  # one-shot flag, always consume it
 
     if enable_drive_by_default:
         return
 
-    button_pressed = is_button_active(enable_drive_button_pin, button_activation)
-    must_enable_drive = button_pressed or enable_drive
-
-    if not must_enable_drive:
+    if not (is_button_active(enable_drive_button_pin, button_activation) or drive_requested):
         storage.disable_usb_drive()
         usb_cdc.enable(console=True, data=False)
 
-    enable_drive(enable_drive_by_default)
-
 
 def is_button_active(pin_name: str, button_activation: bool = False) -> bool:
-    pin_object = getattr(board, pin_name, None)
+    pin_object = getattr(board, pin_name, None) if pin_name else None
 
     if not pin_object:
         return False

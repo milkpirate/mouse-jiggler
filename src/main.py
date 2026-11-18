@@ -1,6 +1,6 @@
 import asyncio
-import os
 import sys
+import time
 
 import board
 import microcontroller
@@ -31,7 +31,7 @@ class SerialCommandHandler:
         if isinstance(chunk, str):
             chunk = chunk.encode()
 
-        self.buffer += chunk
+        self.buffer = (self.buffer + chunk)[-128:]  # bound memory if no newline ever arrives
         return True
 
     def _extract_first_complete_line(self):
@@ -43,11 +43,14 @@ class SerialCommandHandler:
             return None
 
         line, self.buffer = self.buffer.split(b"\n", 1)
-        return line.decode().strip()
+        try:
+            return line.decode().strip()
+        except UnicodeError:
+            return ""
 
     async def command_received(self) -> bool:
         """Process available serial data. Returns True if command matches enable_command."""
-        if not self._fill_buffer():
+        if not self._fill_buffer() and b"\n" not in self.buffer:
             await asyncio.sleep(0.001)
             return False
 
@@ -99,12 +102,11 @@ async def serial_usage_message(enable_command: str):
 
 
 async def jiggler(mouse, interval: int, distance: int, led: LED = None):
-    secs_to_go = interval
+    deadline = time.monotonic() + interval
     print(" "*50, end="\r")
 
-    while secs_to_go:
+    while (secs_to_go := deadline - time.monotonic()) > 0:
         print(f"Next jiggle in {min_sec_fmt(secs_to_go)}... ", end="\r")
-        secs_to_go -= 1
 
         if led:
             await led.fade(to_value=1000, from_value=0, duration=0.5)
@@ -144,10 +146,9 @@ async def run_forever(coro_func, *a, **kw):
 
 
 def setup_led(pin_name: str, inverted: bool) -> LED | None:
-    if not pin_name:
+    if not (pin := getattr(board, pin_name, None) if pin_name else None):
         return None
 
-    pin = getattr(board, pin_name)
     return LED(pin, inverted=inverted, reduce_to=500)
 
 
@@ -155,11 +156,11 @@ async def main():
     mouse = Mouse(usb_hid.devices)
     setup_usb()
 
-    led_pin = os.getenv("led_pin")
-    led_active_low = bool(os.getenv("led_active_low", 0))
-    tickle_interval = os.getenv("tickle_interval")
-    jiggle_distance = os.getenv("jiggle_distance")
-    enable_drive_serial_command = os.getenv("enable_drive_serial_command")
+    led_pin = supervisor.get_setting("led_pin")
+    led_active_low = supervisor.get_setting("led_active_low", False)
+    tickle_interval = supervisor.get_setting("tickle_interval", 300)
+    jiggle_distance = supervisor.get_setting("jiggle_distance", 1)
+    enable_drive_serial_command = supervisor.get_setting("enable_drive_serial_command", "enable_usb_reboot")
 
     if led := setup_led(led_pin, led_active_low):
         led.off()
