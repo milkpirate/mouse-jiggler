@@ -17,16 +17,16 @@ def test_led__init__(cpy_mocks, pin, inverted, reduce_to):
     from src.lib.led import LED
 
     pin = cpy_mocks.board.Pin(pin)
-    LED.off = MagicMock()
 
-    led = LED(pin, inverted, reduce_to)
+    with patch.object(LED, "off") as off_mock:
+        led = LED(pin, inverted, reduce_to)
 
     assert led._pwm is not None
     assert led._inverted == inverted
     assert led._max_brightness == reduce_to
     assert led._brightness == 0
 
-    LED.off.assert_called_once()
+    off_mock.assert_called_once()
     cpy_mocks.pwmio.PWMOut.assert_called_once_with(pin)
 
 
@@ -40,11 +40,11 @@ def test_led__init__defaults(cpy_mocks):
     assert led._max_brightness == LED._steps
 
 
-def test_led__del__(cpy_mocks):
+def test_led_deinit(cpy_mocks):
     from src.lib.led import LED
 
     led = LED(cpy_mocks.board.Pin('pin'))
-    led.__del__()
+    led.deinit()
 
     led._pwm.deinit.assert_called_once()
 

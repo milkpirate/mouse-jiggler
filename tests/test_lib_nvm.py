@@ -6,7 +6,9 @@ import pytest
     "idx, set_idx",[
         (0, 0),
         (-1, 0),
-        (20, 16),
+        (20, 15),
+        (16, 15),
+        (15, 15),
     ]
 )
 def test_nvm__init__(cpy_mocks, idx, set_idx):
@@ -42,3 +44,6 @@ def test_nvm__call__(cpy_mocks):
     b = NVBool(3)
     b(True)
     assert b == True  # noqa: E712
+
+    NVBool(0)(5)  # truthy non-bool values are stored as 1
+    assert cpy_mocks.microcontroller.nvm[0] == 1

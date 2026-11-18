@@ -20,14 +20,14 @@ class LED:
 
         self.off()
 
-    def __del__(self):
+    def deinit(self):
         self._pwm.deinit()
 
     def __enter__(self):
         return self
 
     def __exit__(self, t, value, traceback):
-        self.__del__()
+        self.deinit()
 
     def _saturate(self, value: int) -> int:
         """Map a value from one range to another, with saturation."""
@@ -86,7 +86,7 @@ class LED:
 
     @brightness.setter
     def brightness(self, brightness: int):
-        """Set the LED brightness (0 to 100.0) with gamma correction."""
+        """Set the LED brightness (0 to _max_brightness) with gamma correction."""
 
         brightness = self._saturate(brightness)
         self._brightness = brightness
